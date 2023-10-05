@@ -1,4 +1,4 @@
-const db = require('../dbConfig/pg');
+const db = require('../dbconfig/pg');
 
 class questionPageController {
     async getQuestion(req, res){
