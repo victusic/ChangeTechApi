@@ -1,7 +1,7 @@
-const db = require('../dbConfig/pg');
+const db = require('../dbconfig/pg');
 
 const {MongoClient} = require('mongodb');
-const mongoConnectionString = require('../dbConfig/mongo');
+const mongoConnectionString = require('../dbconfig/mongo');
 
 const client = new MongoClient(mongoConnectionString);
 
