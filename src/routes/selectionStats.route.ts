@@ -1,5 +1,6 @@
-const Router = require('express');
-const router = new Router()
+import { Router } from 'express';
+const router = Router();
+
 const selectionStatsController = require('../controllers/selectionStats.controller');
 
 router.patch('/recall', selectionStatsController.patchRecall);

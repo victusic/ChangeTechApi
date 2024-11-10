@@ -1,76 +1,77 @@
-const db = require('../dbconfig/pg');
+import { Request, Response } from 'express';
+import { PriceCategoryDTO, ProductDTO, ProductParametersElDTO, ProductShopDTO, Query } from '../types';
+
+const db = require('../../dbconfig/pg');
 
 class productPageController {
-    async getPriceCategory(req, res){
+    async getPriceCategory(req: Request, res: Response){
         const category = req.params.category;
         const region = req.query.region;
-        let pricesCategory;
+        let pricesCategory: Query<PriceCategoryDTO[]>;
 
         switch (region) {
-            case 'Ru':
-                pricesCategory = await db.query('SELECT id, "nameRu" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
+            case 'RU':
+                pricesCategory = await db.query('SELECT id, "nameRU" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
                 break;
-            case 'Kz':
-                pricesCategory = await db.query('SELECT id, "nameKz" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
+            case 'KZ':
+                pricesCategory = await db.query('SELECT id, "nameKZ" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
                 break;
             default:
-                pricesCategory = await db.query('SELECT id, "nameEng" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
+                pricesCategory = await db.query('SELECT id, "nameENG" AS "name" FROM "PriceCategoryProduct" WHERE category = $1', [category]);
                 break;
         }
 
         res.json(pricesCategory.rows);
     }
 
-    async getProductParams(req, res){
+    async getProductParams(req: Request, res: Response){
         const id = req.params.id;
 
-        const params = await db.query('SELECT * FROM "Parameters" WHERE id IN (SELECT parameters FROM "ProductParameters" WHERE product = $1)', [id]);
+        const params: Query<ProductParametersElDTO> = await db.query('SELECT * FROM "Parameters" WHERE id IN (SELECT parameters FROM "ProductParameters" WHERE product = $1)', [id]);
 
         res.json(params.rows);
     }
 
-    async getProductShops(req, res){
+    async getProductShops(req: Request, res: Response){
         const id = req.params.id;
         const region = req.query.region;
 
-        const shops = await db.query('SELECT shop AS id, name, image, rate, link, price FROM "ProductShop" AS PS INNER JOIN "Shop" AS SH ON PS.shop = SH.id WHERE PS.product = $1 AND PS.region = (SELECT id FROM "Region" WHERE name = $2)', [id, region]);
+        const shops:  Query<ProductShopDTO> = await db.query(`SELECT shop AS id, name, image, rate, link, price FROM "ProductShop" AS PS INNER JOIN "Shop" AS SH ON PS.shop = SH.id WHERE PS.product = $1 AND PS.region = (SELECT id FROM "Region" WHERE name = $2)`, [id, region]);
 
         res.json(shops.rows);
     }
 
-    async getProducts(req, res){
+    async getProducts(req: Request, res: Response){
         const region = req.query.region;
         const category = req.query.category;
         const priceCategory = req.query.priceCategory;
-        const vector = req.query.vector;
+        const vector: string = req.query.vector as string;
 
         //user Vector
         const usersStartVector = vector.split("|");
 
         const vectorRatio = await db.query('SELECT ratio FROM "VectorParameters" WHERE category = $1', [category]);
 
-        const ratioArray = vectorRatio.rows.map(obj => parseInt(obj.ratio));
+        const ratioArray: number[] = vectorRatio.rows.map((obj: {ratio: string}) => parseInt(obj.ratio));
 
-        let userVector = [];
-        usersStartVector.forEach((element, index) => {
-            userVector.push(element * ratioArray[index])
+        let userVector: number[] = [];
+        usersStartVector.forEach((element: string, index: number) => {
+            userVector.push(parseInt(element) * ratioArray[index])
         });
-
-        //console.log(userVector)
 
         //productVectors
 
         const productsData = await db.query('SELECT product, "vectorParameters", value FROM "ProductVectorParameters" WHERE product IN (SELECT id FROM "Product" WHERE id IN (SELECT product FROM "ProductPriceCategory" WHERE "priceCategory" = $1))', [priceCategory]);
 
-        let allProductsVector = [];
-        let usedProducts = [];
+        let allProductsVector: number[][] = [];
+        let usedProducts: number[] = [];
 
-        productsData.rows.forEach((item, index) => {
+        productsData.rows.forEach((item: { product: number, vectorParameters: number, value: string }, index: number) => {
             if (usedProducts.includes(item.product)) {
-                allProductsVector[item.product][item.vectorParameters ] = parseInt(item.value);
+                allProductsVector[item.product][item.vectorParameters] = parseInt(item.value);
             } else {
                 allProductsVector[item.product] = [item.product];
-                allProductsVector[item.product][item.vectorParameters ] = parseInt(item.value);
+                allProductsVector[item.product][item.vectorParameters] = parseInt(item.value);
                 usedProducts.push(item.product)
             }
         });
@@ -80,13 +81,13 @@ class productPageController {
             return element !== null;
         });
         allProductsVector.forEach((item, index) => {
-            allProductsVector[index] = item.filter(function (element) {
+            allProductsVector[index] = item.filter(function (element: number) {
                 return element !== null;
             });
         });
 
         allProductsVector.forEach(item => {
-            ratioArray.forEach((element, index) => {
+            ratioArray.forEach((element: number, index: number) => {
                 item[index+1] *= element;
             });
         });
@@ -99,8 +100,7 @@ class productPageController {
         });
 
         allProductsVector.forEach(item => {
-            //console.log(item)
-            item.forEach((element, index) => {
+            item.forEach((element: number, index: number) => {
                 if(index != 0){
                     item[1] += element;
                 }
@@ -116,13 +116,13 @@ class productPageController {
 
         //get products
 
-        let products;
+        let products: Query<ProductDTO[]>;
 
         switch (region) {
-            case 'Ru':
+            case 'RU':
                 products = await db.query('SELECT id, name, "officialLink", image, "descriptionRu" AS "description" FROM "Product" WHERE id IN ($1, $2, $3) ORDER BY CASE id WHEN $1 THEN 1 WHEN $2 THEN 2 WHEN $3 THEN 3 END', [allProductsVector[0][0], allProductsVector[1][0], allProductsVector[2][0]]);
                 break;
-            case 'Kz':
+            case 'KZ':
                 products = await db.query('SELECT id, name, "officialLink", image, "descriptionKz" AS "description" FROM "Product" WHERE id IN ($1, $2, $3) ORDER BY CASE id WHEN $1 THEN 1 WHEN $2 THEN 2 WHEN $3 THEN 3 END', [allProductsVector[0][0], allProductsVector[1][0], allProductsVector[2][0]]);
                 break;
             default:

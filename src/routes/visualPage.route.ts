@@ -1,5 +1,6 @@
-const Router = require('express');
-const router = new Router()
+import { Router } from 'express';
+const router = Router();
+
 const visualPageController = require('../controllers/visualPage.controller');
 
 router.get('/shops', visualPageController.getShops);
