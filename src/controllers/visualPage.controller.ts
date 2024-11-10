@@ -1,18 +1,21 @@
-const db = require('../dbconfig/pg');
+import { Request, Response } from 'express';
+import { Query, SelectionDTO, ShopDTO, ViewStatisticDTO, VisitDTO } from '../types';
+
+const db = require('../../dbconfig/pg');
 
 const {MongoClient} = require('mongodb');
-const mongoConnectionString = require('../dbconfig/mongo');
+const mongoConnectionString = require('../../dbconfig/mongo');
 
 const client = new MongoClient(mongoConnectionString);
 
 class visualPageController {
-    async getShops(req, res){
+    async getShops(req: Request, res: Response){
         const region = req.query.region;
-        const shops = await db.query('SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = $1', [region]);
+        const shops: Query<ShopDTO[]> = await db.query('SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = $1', [region]);
         res.json(shops.rows);
     }
 
-    async getStats(req, res){
+    async getStats(req: Request, res: Response){
         await client.connect()
         const db = client.db("ChangeTech");
 
@@ -36,7 +39,7 @@ class visualPageController {
         const recallsCollection = await collectionRecalls.find().toArray();
         const recalls = (recallsCollection[0].count*100) / visit;
 
-        const result = {
+        const result: ViewStatisticDTO = {
             'visits': visit,
             'selections': selection,
             'stats': Math.round(selectionStats)+'%',
@@ -46,26 +49,26 @@ class visualPageController {
         res.json(result);
     }
 
-    async patchVisit(req, res){
+    async patchVisit(req: Request, res: Response){
         await client.connect()
         const db = client.db("ChangeTech");
 
         const collectionVisits = db.collection("Visits");
         const visitsCollection = await collectionVisits.find().toArray();
         const visit = visitsCollection[0].count;
-        const result = await collectionVisits.findOneAndUpdate({count: visit}, { $set: {count: visit + 1}});
+        const result: Query<VisitDTO> = await collectionVisits.findOneAndUpdate({count: visit}, { $set: {count: visit + 1}});
 
         res.json(result);
     }
 
-    async patchSelection(req, res){
+    async patchSelection(req: Request, res: Response){
         await client.connect()
         const db = client.db("ChangeTech");
         
         const collectionSelections = db.collection("Selections");
         const selectionsCollection = await collectionSelections.find().toArray();
         const selection = selectionsCollection[0].count;
-        const result = await collectionSelections.findOneAndUpdate({count: selection}, { $set: {count: selection + 1}});
+        const result: Query<SelectionDTO>  = await collectionSelections.findOneAndUpdate({count: selection}, { $set: {count: selection + 1}});
 
         res.json(result);
     }

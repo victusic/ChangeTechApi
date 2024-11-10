@@ -1,6 +1,7 @@
-const Router = require('express');
+import { Router } from 'express';
+const router = Router();
+
 const productPageController = require('../controllers/productPage.controller');
-const router = new Router()
 
 router.get('/priceCategory/:category', productPageController.getPriceCategory);
 router.get('/product/params/:id', productPageController.getProductParams);
