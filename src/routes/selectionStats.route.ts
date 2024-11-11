@@ -7,4 +7,4 @@ router.patch('/recall', selectionStatsController.patchRecall);
 router.patch('/like', selectionStatsController.patchLike);
 router.patch('/dislike', selectionStatsController.patchDislike);
 
-module.exports = router
+module.exports = router;

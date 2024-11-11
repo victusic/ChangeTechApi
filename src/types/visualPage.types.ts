@@ -3,7 +3,6 @@ export interface ShopDTO {
   image: string;
   link: string;
 }
-
 export interface ViewStatisticDTO {
   visits: number;
   selections: number;
