@@ -51,6 +51,7 @@ app.use(
   productPageController
 );
 
+// eslint-disable-next-line no-console
 app.listen(PORT, () => console.log`server start on port ${PORT}`);
 
 app.use(express.static('images'));

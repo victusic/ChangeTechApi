@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*", "eslint.config.js"],
-  "exclude": ["node_modules", "dist", "eslint.config.js", "dbconfig/**/*"]
+  "exclude": ["node_modules", "dist", "dbconfig/**/*"]
 }

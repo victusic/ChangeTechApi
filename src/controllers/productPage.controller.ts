@@ -80,7 +80,7 @@ class productPageController {
       (obj: { ratio: string }) => parseInt(obj.ratio)
     );
 
-    let userVector: number[] = [];
+    const userVector: number[] = [];
     usersStartVector.forEach((element: string, index: number) => {
       userVector.push(parseInt(element) * ratioArray[index]);
     });
@@ -93,7 +93,7 @@ class productPageController {
     );
 
     let allProductsVector: number[][] = [];
-    let usedProducts: number[] = [];
+    const usedProducts: number[] = [];
 
     productsData.rows.forEach(
       (item: { product: number; vectorParameters: number; value: string }) => {
