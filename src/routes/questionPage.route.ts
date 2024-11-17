@@ -7,4 +7,4 @@ router.get('/answers/:questionId', questionPageController.getAnswers);
 router.get('/vector/:category', questionPageController.getVector);
 router.get('/answer_result/:id', questionPageController.getAnswerResult);
 
-module.exports = router
+module.exports = router;

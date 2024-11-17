@@ -25,5 +25,6 @@ app.options('*', (req, res) => {
     res.sendStatus(200);
 });
 app.use('/', visualPageController, questionPageController, selectionStatsController, productPageController);
+// eslint-disable-next-line no-console
 app.listen(PORT, () => console.log `server start on port ${PORT}`);
 app.use(express.static('images'));

@@ -3,3 +3,5 @@
 
 # Ignore the database connetions
 /dbconfig
+
+/dist

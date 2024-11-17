@@ -8,4 +8,4 @@ router.get('/stats', visualPageController.getStats);
 router.patch('/visit', visualPageController.patchVisit);
 router.patch('/selection', visualPageController.patchSelection);
 
-module.exports = router
+module.exports = router;
