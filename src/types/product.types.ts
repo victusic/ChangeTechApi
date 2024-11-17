@@ -1,4 +1,4 @@
-export interface ProductDTO{
+export interface ProductDTO {
   id: number;
   name: string;
   officialLink: string;
@@ -6,12 +6,12 @@ export interface ProductDTO{
   description: string;
 }
 
-export interface PriceCategoryDTO{
+export interface PriceCategoryDTO {
   id: number;
   name: string;
 }
 
-export interface ProductParametersElDTO{
+export interface ProductParametersElDTO {
   id: number;
   parameter1: string;
   parameter2: string;
@@ -19,7 +19,7 @@ export interface ProductParametersElDTO{
   parameter4: string;
 }
 
-export interface ProductShopDTO{
+export interface ProductShopDTO {
   id: number;
   name: string;
   image: string;

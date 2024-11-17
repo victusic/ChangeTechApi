@@ -12,12 +12,12 @@ export interface AnswerDTO {
   rangeMax: number | null;
 }
 
-export interface VectorElDTO{
+export interface VectorElDTO {
   id: number;
   spoiling: string;
 }
 
-export interface AnswerResultDTO{
+export interface AnswerResultDTO {
   vectorParameter: number;
   value: string;
 }
