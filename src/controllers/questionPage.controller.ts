@@ -79,12 +79,21 @@ class questionPageController {
   async getVector(req: Request, res: Response) {
     const category = req.params.category;
 
-    const vector: Query<VectorElDTO[]> = await db.query(
+    //convert { id: number; spoiling: string } to { id: number; spoiling: number }
+
+    const vector: Query<{ id: number; spoiling: string }[]> = await db.query(
       'SELECT id, spoiling FROM "VectorParameters" WHERE category = $1',
       [category]
     );
 
-    res.json(vector.rows);
+    const result: VectorElDTO[] = vector.rows.map(
+      (row: { id: number; spoiling: string }) => ({
+        ...row,
+        spoiling: parseFloat(row.spoiling),
+      })
+    );
+
+    res.json(result);
   }
 
   async getAnswerResult(req: Request, res: Response) {
