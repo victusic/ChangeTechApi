@@ -14,7 +14,7 @@ export interface AnswerDTO {
 
 export interface VectorElDTO {
   id: number;
-  spoiling: string;
+  spoiling: number;
 }
 
 export interface AnswerResultDTO {
