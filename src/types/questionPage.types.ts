@@ -19,5 +19,5 @@ export interface VectorElDTO {
 
 export interface AnswerResultDTO {
   vectorParameter: number;
-  value: string;
+  value: number;
 }

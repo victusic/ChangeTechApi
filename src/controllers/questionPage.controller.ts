@@ -99,12 +99,22 @@ class questionPageController {
   async getAnswerResult(req: Request, res: Response) {
     const answer = req.params.id;
 
-    const result: Query<AnswerResultDTO[]> = await db.query(
-      'SELECT "vectorParameter", value FROM "Survey" WHERE anser = $1',
-      [answer]
+    //convert { vectorParameter: number; value: string } to { vectorParameter: number; value: number }
+
+    const answerResult: Query<{ vectorParameter: number; value: string }[]> =
+      await db.query(
+        'SELECT "vectorParameter", value FROM "Survey" WHERE anser = $1',
+        [answer]
+      );
+
+    const result: AnswerResultDTO[] = answerResult.rows.map(
+      (row: { vectorParameter: number; value: string }) => ({
+        ...row,
+        value: parseFloat(row.value),
+      })
     );
 
-    res.json(result.rows);
+    res.json(result);
   }
 }
 
