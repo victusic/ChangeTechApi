@@ -55,19 +55,19 @@ class questionPageController {
     switch (region) {
       case 'RU':
         answers = await db.query(
-          'SELECT id, type, "textRu" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textRu" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
       case 'KZ':
         answers = await db.query(
-          'SELECT id, type, "textKz" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textKz" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
       default:
         answers = await db.query(
-          'SELECT id, type, "textEng" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textEng" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
@@ -103,7 +103,7 @@ class questionPageController {
 
     const answerResult: Query<{ vectorParameter: number; value: string }[]> =
       await db.query(
-        'SELECT "vectorParameter", value FROM "Survey" WHERE anser = $1',
+        'SELECT "vectorParameter", value FROM "Survey" WHERE answer = $1',
         [answer]
       );
 
