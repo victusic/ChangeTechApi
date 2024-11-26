@@ -17,10 +17,27 @@ const client = new MongoClient(mongoConnectionString);
 class visualPageController {
   async getShops(req: Request, res: Response) {
     const region = req.query.region;
-    const shops: Query<ShopDTO[]> = await db.query(
-      'SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = $1',
-      [region]
-    );
+
+    let shops: Query<ShopDTO[]>;
+
+    switch (region) {
+      case 'KZ':
+        shops = await db.query(
+          'SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = 1'
+        );
+        break;
+      case 'RU':
+        shops = await db.query(
+          'SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = 2'
+        );
+        break;
+      default:
+        shops = await db.query(
+          'SELECT id, image, "officialLink" AS link  FROM "Shop" WHERE region = 3'
+        );
+        break;
+    }
+
     res.json(shops.rows);
   }
 
