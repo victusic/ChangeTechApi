@@ -23,7 +23,7 @@ export interface ProductShopDTO {
   id: number;
   name: string;
   image: string;
-  rate: string;
+  rate: number;
   link: string;
   price: string;
 }

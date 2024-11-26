@@ -54,12 +54,38 @@ class productPageController {
     const id = req.params.id;
     const region = req.query.region;
 
-    const shops: Query<ProductShopDTO> = await db.query(
+    //convert { id: number; name: string; image: string; rate: string; link: string; price: string; }
+    // to { id: number; name: string; image: string; rate: number; link: string; price: string; }
+
+    const shops: Query<
+      {
+        id: number;
+        name: string;
+        image: string;
+        rate: string;
+        link: string;
+        price: string;
+      }[]
+    > = await db.query(
       `SELECT shop AS id, name, image, rate, link, price FROM "ProductShop" AS PS INNER JOIN "Shop" AS SH ON PS.shop = SH.id WHERE PS.product = $1 AND PS.region = (SELECT id FROM "Region" WHERE name = $2)`,
       [id, region]
     );
 
-    res.json(shops.rows);
+    const result: ProductShopDTO[] = shops.rows.map(
+      (row: {
+        id: number;
+        name: string;
+        image: string;
+        rate: string;
+        link: string;
+        price: string;
+      }) => ({
+        ...row,
+        rate: parseFloat(row.rate),
+      })
+    );
+
+    res.json(result);
   }
 
   async getProducts(req: Request, res: Response) {
