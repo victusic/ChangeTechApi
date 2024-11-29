@@ -42,24 +42,79 @@ class productPageController {
   async getProductParams(req: Request, res: Response) {
     const id = req.params.id;
 
-    const params: Query<ProductParametersElDTO> = await db.query(
+    //convert { id: number; parameter1: string; parameter2: string; parameter3: string; parameter4: string; }
+    // to { id: number; parameters: string[]; }
+
+    const params: Query<
+      {
+        id: number;
+        parameter1: string;
+        parameter2: string;
+        parameter3: string;
+        parameter4: string;
+      }[]
+    > = await db.query(
       'SELECT * FROM "Parameters" WHERE id IN (SELECT parameters FROM "ProductParameters" WHERE product = $1)',
       [id]
     );
 
-    res.json(params.rows);
+    const result: ProductParametersElDTO[] = params.rows.map(
+      (row: {
+        id: number;
+        parameter1: string;
+        parameter2: string;
+        parameter3: string;
+        parameter4: string;
+      }) => ({
+        id: Number(id),
+        parameters: [
+          row.parameter1,
+          row.parameter2,
+          row.parameter3,
+          row.parameter4,
+        ],
+      })
+    );
+
+    res.json(result);
   }
 
   async getProductShops(req: Request, res: Response) {
     const id = req.params.id;
     const region = req.query.region;
 
-    const shops: Query<ProductShopDTO> = await db.query(
+    //convert { id: number; name: string; image: string; rate: string; link: string; price: string; }
+    // to { id: number; name: string; image: string; rate: number; link: string; price: string; }
+
+    const shops: Query<
+      {
+        id: number;
+        name: string;
+        image: string;
+        rate: string;
+        link: string;
+        price: string;
+      }[]
+    > = await db.query(
       `SELECT shop AS id, name, image, rate, link, price FROM "ProductShop" AS PS INNER JOIN "Shop" AS SH ON PS.shop = SH.id WHERE PS.product = $1 AND PS.region = (SELECT id FROM "Region" WHERE name = $2)`,
       [id, region]
     );
 
-    res.json(shops.rows);
+    const result: ProductShopDTO[] = shops.rows.map(
+      (row: {
+        id: number;
+        name: string;
+        image: string;
+        rate: string;
+        link: string;
+        price: string;
+      }) => ({
+        ...row,
+        rate: parseFloat(row.rate),
+      })
+    );
+
+    res.json(result);
   }
 
   async getProducts(req: Request, res: Response) {

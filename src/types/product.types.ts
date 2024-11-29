@@ -13,17 +13,14 @@ export interface PriceCategoryDTO {
 
 export interface ProductParametersElDTO {
   id: number;
-  parameter1: string;
-  parameter2: string;
-  parameter3: string;
-  parameter4: string;
+  parameters: string[];
 }
 
 export interface ProductShopDTO {
   id: number;
   name: string;
   image: string;
-  rate: string;
+  rate: number;
   link: string;
   price: string;
 }

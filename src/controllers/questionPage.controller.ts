@@ -55,19 +55,19 @@ class questionPageController {
     switch (region) {
       case 'RU':
         answers = await db.query(
-          'SELECT id, type, "textRu" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textRu" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
       case 'KZ':
         answers = await db.query(
-          'SELECT id, type, "textKz" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textKz" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
       default:
         answers = await db.query(
-          'SELECT id, type, "textEng" AS "text", "rangeMin", "rangeMax" FROM "Anser" WHERE id IN (SELECT anser FROM "Survey" WHERE question=$1)',
+          'SELECT id, type, "textEng" AS "text", "rangeMin", "rangeMax" FROM "Answer" WHERE id IN (SELECT answer FROM "Survey" WHERE question=$1)',
           [questionId]
         );
         break;
@@ -79,23 +79,42 @@ class questionPageController {
   async getVector(req: Request, res: Response) {
     const category = req.params.category;
 
-    const vector: Query<VectorElDTO[]> = await db.query(
+    //convert { id: number; spoiling: string } to { id: number; spoiling: number }
+
+    const vector: Query<{ id: number; spoiling: string }[]> = await db.query(
       'SELECT id, spoiling FROM "VectorParameters" WHERE category = $1',
       [category]
     );
 
-    res.json(vector.rows);
+    const result: VectorElDTO[] = vector.rows.map(
+      (row: { id: number; spoiling: string }) => ({
+        ...row,
+        spoiling: parseFloat(row.spoiling),
+      })
+    );
+
+    res.json(result);
   }
 
   async getAnswerResult(req: Request, res: Response) {
     const answer = req.params.id;
 
-    const result: Query<AnswerResultDTO[]> = await db.query(
-      'SELECT "vectorParameter", value FROM "Survey" WHERE anser = $1',
-      [answer]
+    //convert { vectorParameter: number; value: string } to { vectorParameter: number; value: number }
+
+    const answerResult: Query<{ vectorParameter: number; value: string }[]> =
+      await db.query(
+        'SELECT "vectorParameter", value FROM "Survey" WHERE answer = $1',
+        [answer]
+      );
+
+    const result: AnswerResultDTO[] = answerResult.rows.map(
+      (row: { vectorParameter: number; value: string }) => ({
+        ...row,
+        value: parseFloat(row.value),
+      })
     );
 
-    res.json(result.rows);
+    res.json(result);
   }
 }
 
